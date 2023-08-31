@@ -9,6 +9,7 @@ app_name = "opencv_webapp"
 urlpatterns = [
     path("", views.first_view, name="first_view"),  # 127.0.0.1:8000
     path("simple_upload/", views.simple_upload, name="simple_upload"),
+    path('detect_face/', views.detect_face, name='detect_face'),
 ]
 
 # MEDIA_URL 은 위의 urlpattern에 추가
