@@ -9,15 +9,30 @@ def cv_detect_face(path):  # path parameter를 통해 파일 경로 받음
     if type(img) is np.ndarray:
         print(img.shape)  # 세로, 가로, 채널
 
+        resize_needed = False
+        
+        # 가로사이즈 확인 후 가로사이즈 변경
+        if img.shape[1] > 640:  # ex) 가로(img.shape[1])가 1280일 경우,
+            resize_needed = True
+            new_w = img.shape[1] * (640.0 / img.shape[1])  # 1280 * (640/1280) = 1280 * 0.5
+            new_h = img.shape[0] * (640.0 / img.shape[1])  # 기존 세로 * (640/1280) = 기존 세로 * 0.5
+        
+        # 세로사이즈 확인 후 세로사이즈 변경
+        elif img.shape[0] > 480:  # ex) 세로(img.shape[0])가 960일 경우,
+            resize_needed = True
+            new_w = img.shape[1] * (480.0 / img.shape[0])  # 기존 가로 * (480/960) = 기존 가로 * 0.5
+            new_h = img.shape[0] * (480.0 / img.shape[0])  # 960 * (480/960) = 960 * 0.5
+
+        if resize_needed == True:
+            img = cv2.resize(img, (int(new_w), int(new_h)))
+
         # Haar-based Cascade Classifier : AdaBoost 기반 머신러닝 물체 인식 모델
         # 이미지에서 눈, 얼굴 등의 부위를 찾는데 주로 이용
 
         # 이미 학습된 모델을 OpenCV 에서 제공 (http://j.mp/2qIxrxX)
         baseUrl = settings.MEDIA_ROOT_URL + settings.MEDIA_URL
 
-        face_cascade = cv2.CascadeClassifier(
-            baseUrl + "haarcascade_frontalface_default.xml"
-        )
+        face_cascade = cv2.CascadeClassifier(baseUrl + "haarcascade_frontalface_default.xml")
         eye_cascade = cv2.CascadeClassifier(baseUrl + "haarcascade_eye.xml")
 
         # 굳이 컬러이미지를 사용해야하는 상황이 아니라면, 컬러이미지를 흑백으로 만든 후 모델 트레이닝 하고, 모델 예측할때에도 흑백이미지로 예측하게끔하기
